@@ -10,7 +10,7 @@ services:
         - CMD
         - python
         - -c
-        - "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"
+        - "import urllib.request; import sys; sys.stdout.write(urllib.request.urlopen('http://localhost:8000/health').read().decode())"
       interval: 30s
       timeout: 5s
       retries: 3
