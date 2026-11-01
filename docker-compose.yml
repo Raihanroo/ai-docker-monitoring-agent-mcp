@@ -6,7 +6,11 @@ services:
     ports:
       - "8000:8000"
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"
       interval: 30s
       timeout: 5s
       retries: 3
@@ -18,10 +22,12 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: app
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
+      POSTGRES_PASSWORD: "${DB_PASSWORD:-changeme}"
       POSTGRES_DB: appdb
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U app -d appdb"]
+      test:
+        - CMD-SHELL
+        - pg_isready -U app -d appdb
       interval: 10s
       timeout: 5s
       retries: 5
@@ -33,7 +39,13 @@ services:
     ports:
       - "8080:80"
     healthcheck:
-      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost/"\]
+      test:
+        - CMD
+        - wget
+        - -q
+        - -O
+        - /dev/null
+        - http://localhost/
       interval: 30s
       timeout: 5s
       retries: 3
