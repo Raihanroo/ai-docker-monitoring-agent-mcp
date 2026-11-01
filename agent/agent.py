@@ -4,12 +4,13 @@ import sys
 
 from dotenv import load_dotenv
 from google import genai
+from google.genai import errors as genai_errors
 from google.genai import types
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
 load_dotenv()
-MODEL = "gemini-3.5-flash"
+MODEL = "gemini-3.8-flash"
 SERVER_PARAMS = StdioServerParameters(
     command=sys.executable,
     args=["mcp_server/server.py"],
@@ -38,9 +39,18 @@ async def ask(question: str) -> str:
             contents = [types.Content(role="user", parts=[types.Part(text=question)])]
 
             while True:
-                response = gemini.models.generate_content(
-                    model=MODEL, contents=contents, config=config
-                )
+                response = None
+                for attempt in range(5):
+                    try:
+                        response = gemini.models.generate_content(
+                            model=MODEL, contents=contents, config=config
+                        )
+                        break
+                    except genai_errors.ServerError:
+                        print(f"  [retry] model busy, attempt {attempt + 1}/5", flush=True)
+                        await asyncio.sleep(10 * (attempt + 1))
+                if response is None:
+                    raise RuntimeError("Gemini unavailable after 5 retries")
                 candidate = response.candidates[0].content
                 contents.append(candidate)
 
