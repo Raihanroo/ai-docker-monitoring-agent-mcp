@@ -5,6 +5,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-Type", "text/plain")
         self.end_headers()
-        self.wfile.write(b"sales-chatbot is running\n")
+        body = b"OK - sales-chatbot is running\n"
+        self.wfile.write(body)
 
 HTTPServer(("0.0.0.0", 8000), Handler).serve_forever()
