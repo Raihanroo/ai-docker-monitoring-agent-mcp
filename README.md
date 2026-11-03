@@ -49,6 +49,21 @@ docker compose ps                 # wait until services show (healthy)
 python agent/agent.py "Are all services running properly?"
 ```
 
+## Web UI
+
+A browser dashboard that shows live container status and lets you ask the agent questions.
+
+```bash
+streamlit run ui/app.py
+```
+
+Then open http://localhost:8501 in your browser.
+
+- **Live container status:** table of all containers, refreshed when the page reloads.
+- **Ask the agent:** type a question and press Ask. The agent calls the MCP tools and shows the answer.
+
+The UI uses the same MCP server and agent code as the command-line agent, so there is no duplication.
+
 ## Test results
 
 | # | Test case | Action | Expected | Actual | Result |
