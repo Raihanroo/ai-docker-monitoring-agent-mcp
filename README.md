@@ -54,9 +54,9 @@ python agent/agent.py "Are all services running properly?"
 | # | Test case | Action | Expected | Actual | Result |
 |---|---|---|---|---|---|
 | 1 | All healthy | Compose up, ask status | All project services healthy | app-db, app-web, sales-chatbot healthy | PASS |
-| 2 | Service stopped | Stop sales-chatbot, ask status | Chatbot reported as down | _pending_ | _pending_ |
-| 3 | Unhealthy service | Force db healthcheck to fail | DB reported unhealthy | _pending_ | _pending_ |
-| 4 | Log inspection | Ask why chatbot is failing | Agent fetches logs and summarizes | _pending_ | _pending_ |
+| 2 | Service stopped | Stop sales-chatbot, ask status | Chatbot reported as down | Agent reported sales-chatbot as exited (exit 137) and app-web/app-db as healthy. Note: the health label said "unhealthy" for a stopped container | PASS (with note) |
+| 3 | Unhealthy service | Pause app-db so healthcheck fails | DB reported unhealthy | docker inspect showed unhealthy; agent reported app-db as paused and unhealthy. Note: used docker pause instead of editing the healthcheck | PASS (with note) |
+| 4 | Log inspection | Ask why chatbot is failing | Agent fetches logs and summarizes | Agent read sales-chatbot logs (200 OK, no errors) and said the chatbot is healthy. It also assumed n8n was a dependency of the chatbot, which is not true in this project | PASS (with note) |
 | 5 | Recovery | Stop and restart sales-chatbot, ask again | System reported normal | Docker: sales-chatbot back to running and healthy after restart. Agent confirmed all three project containers healthy (app-db, app-web, sales-chatbot). n8n and serene_tharp reported as non-project containers | PASS |
 
 ## Limitations
