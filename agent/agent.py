@@ -10,7 +10,7 @@ from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
 load_dotenv()
-MODEL = "gemini-3.8-flash"
+MODEL = "gemini-3.5-flash"
 SERVER_PARAMS = StdioServerParameters(
     command=sys.executable,
     args=["mcp_server/server.py"],
