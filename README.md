@@ -57,7 +57,7 @@ python agent/agent.py "Are all services running properly?"
 | 2 | Service stopped | Stop sales-chatbot, ask status | Chatbot reported as down | _pending_ | _pending_ |
 | 3 | Unhealthy service | Force db healthcheck to fail | DB reported unhealthy | _pending_ | _pending_ |
 | 4 | Log inspection | Ask why chatbot is failing | Agent fetches logs and summarizes | _pending_ | _pending_ |
-| 5 | Recovery | Stop and restart sales-chatbot, ask again | System reported normal | Docker: sales-chatbot back to running and healthy after restart (verified with docker compose ps and inspect). Agent answer pending: Gemini free-tier daily quota exhausted | PARTIAL (Docker verified, agent pending) |
+| 5 | Recovery | Stop and restart sales-chatbot, ask again | System reported normal | Docker: sales-chatbot back to running and healthy after restart. Agent confirmed all three project containers healthy (app-db, app-web, sales-chatbot). n8n and serene_tharp reported as non-project containers | PASS |
 
 ## Limitations
 
