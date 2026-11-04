@@ -5,27 +5,42 @@ mcp = FastMCP("docker-monitor")
 client = docker.from_env()
 MAX_LOG_LINES = 50
 
+# Only containers started by this project's docker-compose file are monitored.
+PROJECT_LABEL = "com.docker.compose.project"
+PROJECT_NAME = "docker-monitor"
+
+
+def _project_containers(all_states: bool = True):
+    return client.containers.list(
+        all=all_states,
+        filters={"label": f"{PROJECT_LABEL}={PROJECT_NAME}"},
+    )
+
 
 def _get(name: str):
-    return client.containers.get(name)
+    """Look up a container by name, only if it belongs to this project."""
+    for c in _project_containers():
+        if c.name == name:
+            return c
+    raise ValueError(f"'{name}' is not a container in project '{PROJECT_NAME}'")
 
 
 @mcp.tool()
 def list_containers() -> list[dict]:
-    """List all containers with name, image and current state."""
+    """List all project containers with name, image and current state."""
     return [
         {
             "name": c.name,
             "image": c.image.tags[0] if c.image.tags else c.image.short_id,
             "state": c.status,
         }
-        for c in client.containers.list(all=True)
+        for c in _project_containers()
     ]
 
 
 @mcp.tool()
 def get_container_status(name: str) -> dict:
-    """Detailed status of one container: state, start time, restart count, exit code."""
+    """Detailed status of one project container: state, start time, restart count, exit code."""
     c = _get(name)
     c.reload()
     state = c.attrs["State"]
@@ -40,7 +55,7 @@ def get_container_status(name: str) -> dict:
 
 @mcp.tool()
 def get_container_health(name: str) -> dict:
-    """Docker healthcheck result (healthy, unhealthy, starting) for one container."""
+    """Docker healthcheck result (healthy, unhealthy, starting) for one project container."""
     c = _get(name)
     c.reload()
     health = c.attrs["State"].get("Health")
@@ -56,16 +71,16 @@ def get_container_health(name: str) -> dict:
 
 @mcp.tool()
 def get_container_logs(name: str, lines: int = 50) -> str:
-    """Most recent log lines of one container. Capped at 50 lines."""
+    """Most recent log lines of one project container. Capped at 50 lines."""
     lines = min(max(lines, 1), MAX_LOG_LINES)
     return _get(name).logs(tail=lines).decode("utf-8", errors="replace")
 
 
 @mcp.tool()
 def check_all_services() -> dict:
-    """Summary of every container's state and health in one call."""
+    """Summary of every project container's state and health in one call."""
     report = {}
-    for c in client.containers.list(all=True):
+    for c in _project_containers():
         c.reload()
         health = c.attrs["State"].get("Health", {}).get("Status", "no healthcheck")
         report[c.name] = {"state": c.status, "health": health}
