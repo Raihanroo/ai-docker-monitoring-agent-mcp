@@ -78,6 +78,6 @@ The UI uses the same MCP server and agent code as the command-line agent, so the
 
 - Monitoring is on demand. The agent checks live state when asked; there is no background polling.
 - No alerting (email or chat) and no automatic restart in version 1.
-- Only the local Docker host is supported.
+- Only containers in the `docker-monitor` compose project are monitored. Other containers on the same host are ignored.
 - Containers outside this project (for example `n8n`) also appear in `check_all_services`, since the tools inspect every container on the host.
 - Model names change over time. `gemini-3.5-flash` was used during testing; update `MODEL` in `agent/agent.py` if Google retires it.
